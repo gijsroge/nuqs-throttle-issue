@@ -1,4 +1,6 @@
-import type { MetaFunction } from "@remix-run/node";
+import type { ActionFunctionArgs, MetaFunction } from "@remix-run/node";
+import { Form } from "@remix-run/react";
+import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 
 export const meta: MetaFunction = () => {
   return [
@@ -7,7 +9,19 @@ export const meta: MetaFunction = () => {
   ];
 };
 
+export const loader = async () => {
+  await new Promise((resolve) => setTimeout(resolve, 500));
+  return { data: "dummy" };
+};
+
 export default function Index() {
+  const [search, setSearch] = useQueryState(
+    "search",
+    parseAsString
+      .withOptions({ throttleMs: 1000, shallow: false })
+      .withDefault("")
+  );
+
   return (
     <div className="flex h-screen items-center justify-center">
       <div className="flex flex-col items-center gap-16">
@@ -27,6 +41,19 @@ export default function Index() {
               className="hidden w-full dark:block"
             />
           </div>
+
+          <Form>
+            <label htmlFor="">Search</label>
+            <input
+              style={{ border: "1px solid white", borderRadius: "5px" }}
+              type="search"
+              value={search}
+              onChange={(event) => {
+                console.log(event.target.value);
+                setSearch(event.target.value);
+              }}
+            />
+          </Form>
         </header>
         <nav className="flex flex-col items-center justify-center gap-4 rounded-3xl border border-gray-200 p-6 dark:border-gray-700">
           <p className="leading-6 text-gray-700 dark:text-gray-200">
